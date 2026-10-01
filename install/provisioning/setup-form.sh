@@ -177,13 +177,15 @@ omarchy_timezones() {
 # A fresh machine often hasn't joined a network yet, so the geo guess fails
 # often; guard it or a `set -e` caller dies before the filter fallback.
 omarchy_prompt_timezone() {
-  local guess status
+  local guess status timezones
+  timezones=$(omarchy_timezones)
   guess=$(tzupdate -p 2>/dev/null) || guess=""
+  grep -qFx -- "$guess" <<<"$timezones" || guess=$(awk -v tz="$guess" '$1 == "L" && $3 == tz {print $2; exit}' /usr/share/zoneinfo/tzdata.zi)
 
-  if [[ -n $guess ]]; then
-    timezone=$(omarchy_timezones | gum choose --height 10 --selected "$guess" --header "Timezone") && status=0 || status=$?
+  if grep -qFx -- "$guess" <<<"$timezones"; then
+    timezone=$(gum choose --height 10 --selected "$guess" --header "Timezone" <<<"$timezones") && status=0 || status=$?
   else
-    timezone=$(omarchy_timezones | gum filter --height 10 --header "Timezone") && status=0 || status=$?
+    timezone=$(gum filter --height 10 --header "Timezone" <<<"$timezones") && status=0 || status=$?
   fi
   ((status == 0)) || return $status
 
