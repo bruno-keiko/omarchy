@@ -213,6 +213,7 @@ grep -qF -- '--selected Europe/Copenhagen' "$GUM_ARGS" || fail "timezone prompt 
 grep -qF UTC "$tmp_dir/stdin.1" || fail "timezone prompt offers the system timezone list"
 grep -qFx Asia/Ashgabat "$tmp_dir/stdin.1" || fail "timezone prompt offers the canonical zone"
 ! grep -qFx Asia/Ashkhabad "$tmp_dir/stdin.1" || fail "timezone prompt drops tzdata backward-compatibility aliases"
+grep -qFx Etc/GMT+5 "$tmp_dir/stdin.1" || fail "timezone prompt offers the fixed-offset zones"
 pass "timezone prompt preselects the geo guess when one is available"
 
 TZ_GUESS=Asia/Calcutta run_prompt omarchy_prompt_timezone "0:Asia/Kolkata"
